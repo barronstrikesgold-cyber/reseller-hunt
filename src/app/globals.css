@@ -74,6 +74,8 @@
     font-family: var(--font-ios);
     min-height: 100%;
     min-height: 100dvh;
+    overflow-x: hidden;
+    max-width: 100%;
   }
 
   body {
@@ -468,6 +470,141 @@
 
 .ios-tab.is-active {
   color: var(--hw-red);
+}
+
+.ios-segment {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin: 0 16px 8px;
+  padding: 4px;
+  min-height: 44px;
+  width: calc(100% - 32px);
+  box-sizing: border-box;
+  border-radius: 10px;
+  background: rgba(118, 118, 128, 0.16);
+}
+
+.ios-segment button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #1c1c1e;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.ios-segment button.is-active {
+  background: #fff;
+  color: var(--hw-red);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+.ios-sport-row .ios-pass-kicker {
+  margin: 4px 0 0;
+}
+
+.ios-review {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ios-bg);
+  overflow-x: hidden;
+  padding-bottom: calc(58px + env(safe-area-inset-bottom));
+}
+
+.ios-review-top {
+  padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
+}
+
+.ios-back {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--hw-red);
+  font-size: 17px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.ios-review-title {
+  margin: 4px 0 0;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+
+.ios-review-photo {
+  width: 100%;
+  max-height: 42vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  overflow: hidden;
+}
+
+.ios-review-photo img {
+  width: 100%;
+  max-width: 100%;
+  max-height: 42vh;
+  height: auto;
+  object-fit: contain;
+}
+
+.ios-review-copy {
+  padding: 16px 16px 24px;
+  display: grid;
+  gap: 8px;
+}
+
+.ios-review-meta {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1c1c1e;
+}
+
+.ios-review-look,
+.ios-review-note {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.ios-review-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+  background: rgba(242, 242, 247, 0.96);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+.ios-review-cta {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.ios-review-cta.is-pass {
+  background: var(--hw-red);
+  color: #fff;
+}
+
+.ios-review-cta.is-buy {
+  background: var(--hw-yellow);
+  color: #1a1a1a;
 }
 
 .sr-only {
