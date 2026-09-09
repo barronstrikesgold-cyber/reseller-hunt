@@ -1,9 +1,7 @@
-"use client";
+use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BookMarked, Camera, DollarSign, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { BookEntry, loadBooks, saveBooks } from "@/lib/books";
 import {
   FINDS,
@@ -42,6 +40,7 @@ export function PhoneApp() {
   const [bookName, setBookName] = useState("");
   const [bookCost, setBookCost] = useState("");
   const [bookDate, setBookDate] = useState("");
+  const [bookError, setBookError] = useState("");
   const cameraRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -85,17 +84,26 @@ export function PhoneApp() {
   }
 
   function addBook() {
-    const cost = Number.parseFloat(bookCost);
+    const cost = Number.parseFloat(bookCost.replace(/[^0-9.]/g, ""));
     const name = bookName.trim();
-    if (!name || !Number.isFinite(cost) || !bookDate) return;
+    if (!name || !Number.isFinite(cost) || cost < 0 || !bookDate) {
+      setBookError("Name, cost, and date are required.");
+      return;
+    }
     const next = [
-      { id: crypto.randomUUID(), name, cost, date: bookDate },
+      {
+        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        name,
+        cost,
+        date: bookDate,
+      },
       ...books,
     ];
     setBooks(next);
     saveBooks(next);
     setBookName("");
     setBookCost("");
+    setBookError("");
   }
 
   function removeBook(id: string) {
@@ -158,6 +166,7 @@ export function PhoneApp() {
             setBookCost={setBookCost}
             bookDate={bookDate}
             setBookDate={setBookDate}
+            bookError={bookError}
             onAdd={addBook}
             onRemove={removeBook}
           />
@@ -260,7 +269,7 @@ function FindsTab({
             <img src={scanPreview} alt="Scan from camera" className="ios-scan-photo" />
             <div className="ios-row-stack">
               <p className="ios-row-title">Type the name on the card</p>
-              <Input
+              <input
                 value={scanName}
                 onChange={(event) => setScanName(event.target.value)}
                 placeholder="Exact casting name"
@@ -432,7 +441,7 @@ function CashTab({
         <div className="ios-card">
           <label className="ios-field">
             <span>Shelf price</span>
-            <Input
+            <input
               inputMode="decimal"
               value={shelfInput}
               onChange={(event) => setShelfInput(event.target.value)}
@@ -446,7 +455,7 @@ function CashTab({
           </label>
           <label className="ios-field">
             <span>Shipping</span>
-            <Input
+            <input
               inputMode="decimal"
               value={shippingInput}
               onChange={(event) => setShippingInput(event.target.value)}
@@ -489,6 +498,7 @@ function BooksTab({
   setBookCost,
   bookDate,
   setBookDate,
+  bookError,
   onAdd,
   onRemove,
 }: {
@@ -499,6 +509,7 @@ function BooksTab({
   setBookCost: (value: string) => void;
   bookDate: string;
   setBookDate: (value: string) => void;
+  bookError: string;
   onAdd: () => void;
   onRemove: (id: string) => void;
 }) {
@@ -506,18 +517,25 @@ function BooksTab({
     <>
       <section className="ios-group">
         <p className="ios-group-title">Log a buy</p>
-        <div className="ios-card ios-form">
+        <form
+          className="ios-card ios-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            onAdd();
+          }}
+        >
           <label className="ios-field">
             <span>Name</span>
-            <Input
+            <input
               value={bookName}
               onChange={(event) => setBookName(event.target.value)}
               placeholder="Gold ’70 AAR Cuda Super"
+              autoComplete="off"
             />
           </label>
           <label className="ios-field">
             <span>Cost</span>
-            <Input
+            <input
               inputMode="decimal"
               value={bookCost}
               onChange={(event) => setBookCost(event.target.value)}
@@ -526,16 +544,17 @@ function BooksTab({
           </label>
           <label className="ios-field">
             <span>Date</span>
-            <Input
+            <input
               type="date"
               value={bookDate}
               onChange={(event) => setBookDate(event.target.value)}
             />
           </label>
-          <Button className="ios-save" type="button" onClick={onAdd}>
+          {bookError ? <p className="ios-book-error">{bookError}</p> : null}
+          <button className="ios-save" type="submit">
             Save buy
-          </Button>
-        </div>
+          </button>
+        </form>
       </section>
 
       <section className="ios-group">
