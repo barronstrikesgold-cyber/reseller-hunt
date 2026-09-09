@@ -11,9 +11,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ChecksProvider>
       <LedgerProvider>
         <ServiceWorkerRegister />
-        <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-[#0c0d10] text-zinc-50">
+        <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-[#F2F2F7] text-black">
           <OfflineBanner />
-          <main className="flex-1 pb-24">{children}</main>
+          <main className="flex-1 pb-[calc(49px+env(safe-area-inset-bottom))]">{children}</main>
           <BottomNav />
         </div>
       </LedgerProvider>
