@@ -4,15 +4,15 @@ Phone buy/pass for aisle hunting. Tonight list, cash left after ~13% fees and yo
 
 ## Open on iPhone (Safari)
 
-Lasting public link (GitHub Pages):
+Tap this https link:
 
-**https://barronstrikesgold-cyber.github.io/reseller-hunt/**
+**https://barronstrikesgold-cyber.github.io/**
 
-Repo: https://github.com/barronstrikesgold-cyber/reseller-hunt
+Add to Home Screen if you want. Checks and the ledger stay on that phone.
 
-If that 404s, GitHub still needs Pages turned on once: open the repo on the phone → **About** → **Settings** is easier from a computer: **Settings → Pages → Source: GitHub Actions**. Then wait for the Actions green check.
+Source: https://github.com/barronstrikesgold-cyber/reseller-hunt
 
-This app is a static site. Any https host of the `out/` folder works. `localhost` and file attachments do not open in iPhone Safari.
+`localhost` and HTML file attachments do not open in iPhone Safari. This is a public GitHub Pages site.
 
 ## What it does
 
