@@ -1,13 +1,12 @@
 "use client";
 
 import { Suspense, useMemo, useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Field, Group, Hairline, IosScreen, PrimaryButton, fieldControl } from "@/components/ios";
 import { DEFAULT_SHIPPING, FEE_RATE, itemById, tonightBuyItems, type HuntItem } from "@/data/hunt";
 import { useChecks } from "@/lib/checks";
 import { useLedger } from "@/lib/ledger";
 import { money, parseDollars, priceDeal, shelfDefault } from "@/lib/money";
-import { cn } from "@/lib/utils";
 
 const STORES = ["Walmart", "Target", "Grocery", "Goodwill", "GameStop", "Other"];
 
@@ -56,159 +55,124 @@ function CashForm({ item }: { item: HuntItem }) {
     router.push("/books");
   }
 
-  return (
-    <div>
-      <header className="sticky top-0 z-20 border-b border-white/10 bg-[#0c0d10] px-4 pt-4 pb-3">
-        <p className="text-[12px] font-semibold tracking-[0.18em] text-amber-300 uppercase">
-          Spend
-        </p>
-        <h1 className="mt-1 text-[28px] leading-none font-bold tracking-tight">Buy or pass</h1>
-        <p className="mt-2 text-[14px] text-zinc-400">
-          Shelf vs stored sold. Fees {Math.round(FEE_RATE * 100)}%. Shipping is your estimate.
-        </p>
-      </header>
+  const caption =
+    deal.verdict === "unknown"
+      ? "Unknown. No settled sold. No profit number."
+      : deal.verdict === "buy"
+        ? "Buy. Leftover cash is real after fees and ship."
+        : "Leave. Leftover cash is not real at this shelf price.";
 
+  return (
+    <IosScreen title="Cash" subtitle={`Shelf vs stored sold. Fees ${Math.round(FEE_RATE * 100)}%. Shipping is your estimate.`}>
       <form
-        className="space-y-4 px-4 pt-4"
         onSubmit={(e) => {
           e.preventDefault();
           markBuy();
         }}
       >
-        <label className="block space-y-1">
-          <span className="text-[13px] font-semibold text-zinc-400">Tonight item</span>
-          <select
-            value={item.id}
-            onChange={(e) => router.replace(`/cash?item=${e.target.value}`)}
-            className="min-h-12 w-full rounded-xl bg-zinc-900 px-3 text-[16px] text-zinc-50 ring-1 ring-white/10"
-          >
-            {items.map((row) => (
-              <option key={row.id} value={row.id}>
-                {row.name}
-                {row.sold ? ` · sold ${money(row.sold.dollars)}` : " · no settled sold"}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <div className="grid grid-cols-2 gap-3">
-          <label className="block space-y-1">
-            <span className="text-[13px] font-semibold text-zinc-400">Shelf price</span>
+        <Group header="Deal">
+          <Field label="Item">
+            <select
+              value={item.id}
+              onChange={(e) => router.replace(`/cash?item=${e.target.value}`)}
+              className={fieldControl}
+            >
+              {items.map((row) => (
+                <option key={row.id} value={row.id}>
+                  {row.name}
+                  {row.sold ? ` · sold ${money(row.sold.dollars)}` : " · no settled sold"}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Hairline inset={16} />
+          <Field label="Shelf">
             <input
               inputMode="decimal"
               value={shelf}
               onChange={(e) => setShelf(e.target.value)}
-              className="min-h-12 w-full rounded-xl bg-zinc-900 px-3 text-[18px] font-semibold tabular-nums ring-1 ring-white/10"
+              className={`${fieldControl} tabular-nums`}
+              aria-label="Shelf price"
             />
-            <span className="text-[12px] text-zinc-500">
-              {item.buyPrice ? `${item.buyPrice.amount} ${item.buyPrice.kind}` : "what you pay"}
-            </span>
-          </label>
-          <label className="block space-y-1">
-            <span className="text-[13px] font-semibold text-zinc-400">Ship estimate</span>
+          </Field>
+          <Hairline inset={16} />
+          <Field label="Ship">
             <input
               inputMode="decimal"
               value={ship}
               onChange={(e) => setShip(e.target.value)}
-              className="min-h-12 w-full rounded-xl bg-zinc-900 px-3 text-[18px] font-semibold tabular-nums ring-1 ring-white/10"
+              className={`${fieldControl} tabular-nums`}
+              aria-label="Shipping estimate"
             />
-            <span className="text-[12px] text-zinc-500">edit this · not a sold number</span>
-          </label>
-        </div>
+          </Field>
+        </Group>
+        <p className="px-8 text-[13px] text-[#8E8E93]">
+          {item.buyPrice ? `${item.buyPrice.amount} ${item.buyPrice.kind}. ` : ""}
+          Ship is an estimate, not a sold number.
+        </p>
 
-        <div className="grid grid-cols-2 gap-3">
-          <label className="block space-y-1">
-            <span className="text-[13px] font-semibold text-zinc-400">Store</span>
-            <select
-              value={store}
-              onChange={(e) => setStore(e.target.value)}
-              className="min-h-12 w-full rounded-xl bg-zinc-900 px-3 text-[16px] ring-1 ring-white/10"
-            >
+        <Group header="Trip">
+          <Field label="Store">
+            <select value={store} onChange={(e) => setStore(e.target.value)} className={fieldControl}>
               {STORES.map((s) => (
                 <option key={s}>{s}</option>
               ))}
             </select>
-          </label>
-          <label className="block space-y-1">
-            <span className="text-[13px] font-semibold text-zinc-400">Date</span>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="min-h-12 w-full rounded-xl bg-zinc-900 px-3 text-[16px] ring-1 ring-white/10"
-            />
-          </label>
-        </div>
+          </Field>
+          <Hairline inset={16} />
+          <Field label="Date">
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={fieldControl} />
+          </Field>
+        </Group>
 
-        <section className="rounded-2xl bg-[#16181f] p-4 ring-1 ring-white/10">
+        <Group header="Result" footer={caption}>
           {sold === null ? (
-            <>
-              <p className="text-[13px] font-semibold tracking-wide text-zinc-400 uppercase">Sold</p>
-              <p className="mt-1 text-[28px] font-bold">unknown</p>
-              <p className="mt-1 text-[15px] text-zinc-300">No settled sold. No profit number.</p>
-            </>
+            <div className="flex min-h-14 items-center justify-between px-4">
+              <span className="text-[17px] text-black">Sold</span>
+              <span className="text-[17px] text-[#8E8E93]">Unknown</span>
+            </div>
           ) : (
             <>
-              <p className="text-[13px] font-semibold tracking-wide text-zinc-400 uppercase">
-                Stored sold · tracked average
-              </p>
-              <p className="mt-1 text-[28px] font-bold tabular-nums">{money(sold)}</p>
-              <p className="mt-1 text-[13px] text-zinc-400">{item.sold?.note}</p>
-              <dl className="mt-4 space-y-2 text-[15px]">
-                <div className="flex justify-between gap-3">
-                  <dt className="text-zinc-400">eBay fees ~13%</dt>
-                  <dd className="tabular-nums">{money(deal.fees ?? 0)}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-zinc-400">Ship estimate</dt>
-                  <dd className="tabular-nums">{money(shipN)}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-zinc-400">Shelf</dt>
-                  <dd className="tabular-nums">{money(shelfN)}</dd>
-                </div>
-                <div className="flex justify-between gap-3 border-t border-white/10 pt-2">
-                  <dt className="font-semibold">Cash left</dt>
-                  <dd
-                    className={cn(
-                      "text-[22px] font-bold tabular-nums",
-                      (deal.cashLeft ?? 0) > 0 ? "text-emerald-300" : "text-rose-300"
-                    )}
-                  >
-                    {money(deal.cashLeft ?? 0)}
-                  </dd>
-                </div>
-              </dl>
+              <div className="flex min-h-11 items-center justify-between px-4">
+                <span className="text-[17px] text-black">Sold</span>
+                <span className="text-[17px] tabular-nums text-black">{money(sold)}</span>
+              </div>
+              <Hairline inset={16} />
+              <div className="flex min-h-11 items-center justify-between px-4">
+                <span className="text-[17px] text-black">Fees ~13%</span>
+                <span className="text-[17px] tabular-nums text-[#8E8E93]">{money(deal.fees ?? 0)}</span>
+              </div>
+              <Hairline inset={16} />
+              <div className="flex min-h-11 items-center justify-between px-4">
+                <span className="text-[17px] text-black">Ship</span>
+                <span className="text-[17px] tabular-nums text-[#8E8E93]">{money(shipN)}</span>
+              </div>
+              <Hairline inset={16} />
+              <div className="flex min-h-11 items-center justify-between px-4">
+                <span className="text-[17px] text-black">Shelf</span>
+                <span className="text-[17px] tabular-nums text-[#8E8E93]">{money(shelfN)}</span>
+              </div>
+              <Hairline inset={16} />
+              <div className="flex min-h-[52px] items-center justify-between px-4">
+                <span className="text-[17px] font-semibold text-black">Cash left</span>
+                <span className="text-[22px] font-semibold tabular-nums text-black">
+                  {money(deal.cashLeft ?? 0)}
+                </span>
+              </div>
             </>
           )}
-        </section>
+        </Group>
+        {item.sold?.note ? (
+          <p className="px-8 pb-1 text-[13px] text-[#8E8E93]">{item.sold.note}</p>
+        ) : null}
 
-        {deal.verdict === "unknown" ? (
-          <p className="rounded-xl bg-zinc-900 px-4 py-3 text-[15px] text-zinc-200 ring-1 ring-white/10">
-            PASS on a profit claim. You can still check it on Tonight if you saw it.
-          </p>
-        ) : deal.verdict === "buy" ? (
-          <p className="rounded-xl bg-emerald-500/15 px-4 py-3 text-[16px] font-semibold text-emerald-200 ring-1 ring-emerald-400/30">
-            BUY. Leftover cash is real after fees and ship.
-          </p>
-        ) : (
-          <p className="rounded-xl bg-rose-500/15 px-4 py-3 text-[16px] font-semibold text-rose-200 ring-1 ring-rose-400/30">
-            PASS. Leftover cash is not real at this shelf price.
-          </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={deal.verdict !== "buy"}
-          className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-amber-300 text-[17px] font-bold text-black disabled:bg-zinc-800 disabled:text-zinc-500"
-        >
-          {deal.verdict === "buy" ? "Mark buy · put on the books" : "Mark buy locked"}
-        </button>
-        <Link href="/books" className="block min-h-12 text-center text-[15px] font-semibold text-amber-300">
-          Open books
-        </Link>
+        <div className="px-4 pt-4 pb-6">
+          <PrimaryButton type="submit" disabled={deal.verdict !== "buy"}>
+            {deal.verdict === "buy" ? "Mark Buy" : "Mark Buy Locked"}
+          </PrimaryButton>
+        </div>
       </form>
-    </div>
+    </IosScreen>
   );
 }
 
@@ -217,13 +181,13 @@ function CashBody() {
   const params = useSearchParams();
   const paramItem = params.get("item");
   const item = (paramItem && itemById(paramItem)) || items[0];
-  if (!item) return <p className="px-4 pt-8 text-zinc-400">No tonight items.</p>;
+  if (!item) return <p className="px-4 pt-8 text-[#8E8E93]">No tonight items.</p>;
   return <CashForm key={item.id} item={item} />;
 }
 
 export default function CashPage() {
   return (
-    <Suspense fallback={<div className="px-4 pt-8 text-zinc-400">Loading cash…</div>}>
+    <Suspense fallback={<div className="px-4 pt-8 text-[#8E8E93]">Loading cash…</div>}>
       <CashBody />
     </Suspense>
   );

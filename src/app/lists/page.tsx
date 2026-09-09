@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { HuntGroup } from "@/components/hunt-card";
+import { Chevron, Group, Hairline, IosScreen } from "@/components/ios";
 import {
   CATEGORY_LABEL,
   ITEMS,
@@ -31,55 +32,42 @@ function ListsBody() {
   const groups = groupItems(items);
 
   return (
-    <div>
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0c0d10] px-4 pt-4 pb-3">
-        <p className="text-[12px] font-semibold tracking-[0.18em] text-amber-300 uppercase">
-          Checkable lists
-        </p>
-        <h1 className="mt-1 text-[28px] leading-none font-bold tracking-tight">By aisle</h1>
-        <p className="mt-2 text-[14px] text-zinc-400">
-          {all.done}/{all.total} checked on this phone
-        </p>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          {cats.map((id) => (
+    <IosScreen title="Lists" subtitle={`${all.done} of ${all.total} checked on this phone`}>
+      <Group header="Aisle">
+        {cats.map((id, index) => (
+          <div key={id}>
+            {index > 0 ? <Hairline inset={16} /> : null}
             <Link
-              key={id}
               href={`/lists?cat=${id}`}
-              className={cn(
-                "flex min-h-12 items-center justify-center rounded-xl px-2 text-[14px] font-semibold ring-1",
-                cat === id
-                  ? "bg-amber-300 text-black ring-amber-200"
-                  : "bg-zinc-900 text-zinc-200 ring-white/10"
-              )}
+              className="flex min-h-11 items-center justify-between px-4"
             >
-              {CATEGORY_LABEL[id]}
+              <span className={cn("text-[17px]", cat === id ? "font-semibold text-black" : "text-black")}>
+                {CATEGORY_LABEL[id]}
+              </span>
+              {cat === id ? <span className="text-[15px] text-[#8E8E93]">Selected</span> : <Chevron />}
             </Link>
-          ))}
-        </div>
-        <p className="mt-2 text-[13px] text-zinc-500">
-          {CATEGORY_LABEL[cat]} · {done} of {total} checked
-        </p>
-        <Link href="/releases" className="mt-2 inline-flex min-h-11 items-center text-[14px] font-semibold text-amber-300">
-          Dated Pokémon releases →
-        </Link>
-      </header>
-
-      <div className="space-y-5 px-4 pt-4">
-        {groups.map((group) => (
-          <HuntGroup key={`${cat}-${group.name}`} title={group.name} items={group.items} />
+          </div>
         ))}
-      </div>
-    </div>
+      </Group>
+      <p className="px-8 text-[13px] text-[#8E8E93]">
+        {CATEGORY_LABEL[cat]} · {done} of {total} checked
+      </p>
+      <Group>
+        <Link href="/releases" className="flex min-h-11 items-center px-4">
+          <span className="flex-1 text-[17px] text-black">Retail drops</span>
+          <Chevron />
+        </Link>
+      </Group>
+      {groups.map((group) => (
+        <HuntGroup key={`${cat}-${group.name}`} title={group.name} items={group.items} />
+      ))}
+    </IosScreen>
   );
 }
 
 export default function ListsPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="px-4 pt-8 text-[15px] text-zinc-400">Loading lists…</div>
-      }
-    >
+    <Suspense fallback={<div className="px-4 pt-8 text-[#8E8E93]">Loading lists…</div>}>
       <ListsBody />
     </Suspense>
   );
