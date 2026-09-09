@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-function TonightIcon({ active }: { active: boolean }) {
+function FindsIcon({ active }: { active: boolean }) {
   return (
     <svg width="25" height="25" viewBox="0 0 25 25" aria-hidden>
       <path
@@ -51,7 +51,7 @@ function BooksIcon({ active }: { active: boolean }) {
 }
 
 const tabs = [
-  { href: "/", label: "Tonight", Icon: TonightIcon },
+  { href: "/", label: "Finds", Icon: FindsIcon },
   { href: "/cash", label: "Cash", Icon: CashIcon },
   { href: "/books", label: "Books", Icon: BooksIcon },
 ] as const;

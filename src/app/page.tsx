@@ -15,12 +15,12 @@ const filters = [
   { id: "super", label: "Super" },
   { id: "th", label: "TH" },
   { id: "matchbox", label: "Matchbox" },
-  { id: "pokemon", label: "Pokémon" },
+  { id: "pokemon", label: "Pok\u00e9mon" },
 ] as const;
 
 type FilterId = (typeof filters)[number]["id"];
 
-export default function TonightPage() {
+export default function FindsPage() {
   const items = tonightItems();
   const { countFor } = useChecks();
   const [filter, setFilter] = useState<FilterId>("all");
@@ -42,8 +42,8 @@ export default function TonightPage() {
 
   return (
     <IosScreen
-      title="Tonight"
-      subtitle={`${remaining} open · ${done} checked · ${AS_OF}`}
+      title="Finds"
+      subtitle={`${remaining} open \u00b7 ${done} checked \u00b7 ${AS_OF}`}
     >
       <div className="px-4 pb-1">
         <div className="flex gap-1 overflow-x-auto pb-1">

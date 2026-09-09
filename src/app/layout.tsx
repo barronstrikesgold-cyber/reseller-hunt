@@ -3,14 +3,14 @@ import { AppShell } from "@/components/app-shell";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Reseller Hunt",
+  title: "Reseller",
   description:
     "Aisle buy/pass. Shelf vs stored sold, cash left after fees and ship. Checks stay on this phone.",
-  applicationName: "Hunt",
+  applicationName: "Reseller",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Hunt",
+    title: "Reseller",
   },
   icons: {
     icon: "/icon.svg",

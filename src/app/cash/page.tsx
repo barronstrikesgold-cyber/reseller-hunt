@@ -80,13 +80,13 @@ function CashForm({ item }: { item: HuntItem }) {
               {items.map((row) => (
                 <option key={row.id} value={row.id}>
                   {row.name}
-                  {row.sold ? ` · sold ${money(row.sold.dollars)}` : " · no settled sold"}
+                  {row.sold ? ` \u00b7 sold ${money(row.sold.dollars)}` : " \u00b7 no settled sold"}
                 </option>
               ))}
             </select>
           </Field>
           <Hairline inset={16} />
-          <Field label="Shelf">
+          <Field label="Shelf price">
             <input
               inputMode="decimal"
               value={shelf}
@@ -107,7 +107,7 @@ function CashForm({ item }: { item: HuntItem }) {
           </Field>
         </Group>
         <p className="px-8 text-[13px] text-[#8E8E93]">
-          {item.buyPrice ? `${item.buyPrice.amount} ${item.buyPrice.kind}. ` : ""}
+          {item.buyPrice ? `${item.buyPrice.amount}. ` : ""}
           Ship is an estimate, not a sold number.
         </p>
 
@@ -181,13 +181,13 @@ function CashBody() {
   const params = useSearchParams();
   const paramItem = params.get("item");
   const item = (paramItem && itemById(paramItem)) || items[0];
-  if (!item) return <p className="px-4 pt-8 text-[#8E8E93]">No tonight items.</p>;
+  if (!item) return <p className="px-4 pt-8 text-[#8E8E93]">No finds.</p>;
   return <CashForm key={item.id} item={item} />;
 }
 
 export default function CashPage() {
   return (
-    <Suspense fallback={<div className="px-4 pt-8 text-[#8E8E93]">Loading cash…</div>}>
+    <Suspense fallback={<div className="px-4 pt-8 text-[#8E8E93]">Loading cash\u2026</div>}>
       <CashBody />
     </Suspense>
   );
