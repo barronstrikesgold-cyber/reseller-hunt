@@ -1,28 +1,12 @@
-export type Sale =
-  | { kind: "settled"; amount: number; line: string }
-  | { kind: "none" };
+import { SPORTS } from "./sports";
+import type { FindItem } from "./item";
 
-export type FindItem = {
-  id: string;
-  name: string;
-  group: "case" | "supers" | "open" | "chase" | "sept16";
-  groupLabel: string;
-  badge: string;
-  detail: string;
-  superColor: string;
-  aliases: string[];
-  photo: string;
-  photoAlt: string;
-  shelf: number;
-  shelfLabel: string;
-  sale: Sale;
-  note?: string;
-};
+export type { AisleId, FindItem, Sale } from "./item";
 
-export const FINDS: FindItem[] = [
+const CAR_ROWS: Omit<FindItem, "aisle">[] = [
   {
     id: "cuda",
-    name: "’70 AAR Cuda",
+    name: "'70 AAR Cuda",
     group: "case",
     groupLabel: "Case P and Q",
     badge: "Super · case P",
@@ -39,14 +23,14 @@ export const FINDS: FindItem[] = [
       "jjm28",
     ],
     photo: "/photos/cuda.jpg",
-    photoAlt: "Gold 2026 Super ’70 Plymouth AAR Cuda",
+    photoAlt: "Gold 2026 Super '70 Plymouth AAR Cuda",
     shelf: 1,
     shelfLabel: "About $1",
     sale: { kind: "none" },
   },
   {
     id: "firebird",
-    name: "’67 Firebird 400",
+    name: "'67 Firebird 400",
     group: "case",
     groupLabel: "Case P and Q",
     badge: "Super · case Q",
@@ -61,7 +45,7 @@ export const FINDS: FindItem[] = [
       "jjm29",
     ],
     photo: "/photos/firebird.jpg",
-    photoAlt: "Blue 2026 Super ’67 Pontiac Firebird 400",
+    photoAlt: "Blue 2026 Super '67 Pontiac Firebird 400",
     shelf: 1,
     shelfLabel: "About $1",
     sale: { kind: "none" },
@@ -168,7 +152,7 @@ export const FINDS: FindItem[] = [
   },
   {
     id: "impala",
-    name: "’64 Impala",
+    name: "'64 Impala",
     group: "supers",
     groupLabel: "Supers with a settled sale",
     badge: "Super",
@@ -176,7 +160,7 @@ export const FINDS: FindItem[] = [
     superColor: "Teal Super",
     aliases: ["impala", "64 impala", "'64 impala", "chevy impala"],
     photo: "/photos/impala.jpg",
-    photoAlt: "Teal ’64 Impala Super Treasure Hunt",
+    photoAlt: "Teal '64 Impala Super Treasure Hunt",
     shelf: 1,
     shelfLabel: "About $1",
     sale: {
@@ -215,7 +199,7 @@ export const FINDS: FindItem[] = [
     groupLabel: "Matchbox — card must say SUPER CHASE",
     badge: "SUPER CHASE only",
     detail:
-      "Yellow Integra, ’85 Porsche 911 Rally, ’78 Bronco, 2020 GT-R NISMO.",
+      "Yellow Integra, '85 Porsche 911 Rally, '78 Bronco, 2020 GT-R NISMO.",
     superColor: "Only if the card says SUPER CHASE",
     aliases: [
       "super chase",
@@ -234,7 +218,7 @@ export const FINDS: FindItem[] = [
       "gtr nismo",
     ],
     photo: "/photos/matchbox.jpg",
-    photoAlt: "Matchbox Super Chase card for the ’78 Bronco",
+    photoAlt: "Matchbox Super Chase card for the '78 Bronco",
     shelf: 1,
     shelfLabel: "About $1",
     sale: { kind: "none" },
@@ -267,6 +251,13 @@ export const FINDS: FindItem[] = [
   },
 ];
 
+export const CARS: FindItem[] = CAR_ROWS.map((item) => ({
+  ...item,
+  aisle: "cars",
+}));
+
+export const FINDS: FindItem[] = [...CARS, ...SPORTS];
+
 const PASS_BLOCK = [
   "fast foodie",
   "knight rider",
@@ -279,12 +270,14 @@ const PASS_BLOCK = [
   "904",
   "pink 911",
   "pink porsche",
+  "hobby box",
+  "hobby boxes",
 ];
 
 function normalize(value: string) {
   return value
     .toLowerCase()
-    .replace(/[’']/g, "'")
+    .replace(/['']/g, "'")
     .replace(/[^a-z0-9'.+\-\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -297,9 +290,16 @@ export function matchFinds(query: string): FindItem[] {
 
   return FINDS.filter((item) => {
     const hay = normalize(
-      [item.name, item.detail, item.badge, item.superColor, ...item.aliases].join(
-        " ",
-      ),
+      [
+        item.name,
+        item.detail,
+        item.badge,
+        item.superColor,
+        item.sport,
+        item.packType,
+        item.lookFor,
+        ...item.aliases,
+      ].join(" "),
     );
     if (hay.includes(q) || q.includes(normalize(item.name))) return true;
     return item.aliases.some((alias) => {
@@ -310,7 +310,15 @@ export function matchFinds(query: string): FindItem[] {
 }
 
 export function saleLine(item: FindItem) {
-  return item.sale.kind === "settled" ? item.sale.line : "No settled sale";
+  return item.sale.kind === "settled" ? item.sale.line : "No settled sale.";
+}
+
+export function packTypeLabel(item: FindItem) {
+  if (item.packType === "hanger") return "Hanger";
+  if (item.packType === "blaster") return "Blaster";
+  if (item.packType === "value") return "Value";
+  if (item.packType === "mega") return "Mega";
+  return item.badge;
 }
 
 export function cashLeft(
@@ -322,4 +330,11 @@ export function cashLeft(
   if (item.sale.kind !== "settled") return null;
   const proceeds = item.sale.amount * (1 - feeRate);
   return proceeds - shipping - shelf;
+}
+
+export function isBuy(
+  item: FindItem,
+  leftover: number | null,
+) {
+  return leftover !== null && leftover > 0;
 }
