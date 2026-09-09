@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0 --port 43217",
-    "build": "node scripts/make-icon.mjs && next build",
+    "build": "node scripts/fetch-photos.mjs && node scripts/make-icon.mjs && next build",
     "start": "npx --yes serve out -l tcp://0.0.0.0:43217",
     "lint": "eslint"
   },
