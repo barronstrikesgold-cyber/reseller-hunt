@@ -1,27 +1,33 @@
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = join(root, "public", "photos");
-const dataDir = join(root, "scripts", "photo-data");
 
 const FILES = {
-  "hw-cuda-sth.jpg":
-    "https://164custom.com/images/HW/10900/super_treasure_hunt_2026_1.jpg",
-  "hw-skyline-th.jpg":
-    "https://164custom.com/images/HW/10650/Nissan-Skyline-HT-2000GT-X-RTH-Hot-Wheels-2026-Case-P.jpg",
-  "hw-firebird-sth.jpg":
-    "https://164custom.com/images/HW/10949/2026-hot-Wheels-Case-Q-67-Pontiac-Firebird-400-SUPER-TH.jpg",
-  "hw-f40-sth.jpg":
-    "https://164custom.com/images/HW/9877/2026-Hot-Wheels-Super-Treasure-Hunt-STH-Ferrari-F40-Black-02.jpg",
-  "hw-civic-sth.jpg": null,
-  "hw-elise-sth.jpg":
-    "https://164custom.com/images/HW/10220/2026_Hot_wheels_Super_treasure_hunt.jpg",
-  "mb-integra.jpg":
-    "https://www.heavymetaldiecast.com/cdn/shop/files/20260721-060209.jpg?v=1784629077",
-  "pk-30th-etb.jpg":
-    "https://obsidia-tcg.store/cdn/shop/files/30thCelebrationEliteTrainerBox1_dd0eab59-d95a-448a-91db-96d60d7c1c43.webp?v=1782915396",
+  "cuda.jpg":
+    "https://storage.ghost.io/c/81/4f/814f42c9-9554-47a0-a5c0-499b2f9606cf/content/images/size/w960/2026/05/26-STH-70-Plymouth-AAR-Cuda-1-1.jpg",
+  "firebird.jpg":
+    "https://storage.ghost.io/c/81/4f/814f42c9-9554-47a0-a5c0-499b2f9606cf/content/images/2026/05/26-STH-67-Pontiac-Firebird-400-1.jpg",
+  "skyline.jpg":
+    "https://storage.ghost.io/c/81/4f/814f42c9-9554-47a0-a5c0-499b2f9606cf/content/images/2026/07/26-TH-Nissan-Skyline-HT-2000GT-X--1w.jpg",
+  "f40.jpg":
+    "https://storage.ghost.io/c/81/4f/814f42c9-9554-47a0-a5c0-499b2f9606cf/content/images/2025/09/2026-STH-Ferrari-F40-Competizione-L-4.jpg",
+  "civic.jpg":
+    "https://storage.ghost.io/c/81/4f/814f42c9-9554-47a0-a5c0-499b2f9606cf/content/images/2025/10/26-STH-Honda-Civic-Custom-2.jpg",
+  "lotus.jpg":
+    "https://storage.ghost.io/c/81/4f/814f42c9-9554-47a0-a5c0-499b2f9606cf/content/images/2025/12/26-STH-Lotus-Sport-Elise-2.jpg",
+  "mustang.jpg":
+    "https://storage.ghost.io/c/81/4f/814f42c9-9554-47a0-a5c0-499b2f9606cf/content/images/2025/06/2026-STH-Ford-Mustang-GTD-3.jpg",
+  "impala.jpg":
+    "https://storage.ghost.io/c/81/4f/814f42c9-9554-47a0-a5c0-499b2f9606cf/content/images/2025/10/26-STH-64-Impala-1.jpg",
+  "porsche.jpg":
+    "https://storage.ghost.io/c/81/4f/814f42c9-9554-47a0-a5c0-499b2f9606cf/content/images/2026/01/26-STH-Porsche-911-Carrera-RS-27-1.jpg",
+  "matchbox.jpg":
+    "https://s1.cdn.autoevolution.com/images/news/gallery/next-two-matchbox-super-chase-collectibles-are-a-ford-and-a-nissan_1.jpg",
+  "etb.jpg":
+    "https://www.codedyellow.com/wp-content/uploads/2026/07/ETB-FI.jpg",
 };
 
 const UA =
@@ -31,30 +37,15 @@ function isJpeg(buf) {
   return buf.length > 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
 }
 
-function fromB64(name) {
-  const b64Path = join(dataDir, `${name}.b64`);
-  if (!existsSync(b64Path)) return null;
-  return Buffer.from(readFileSync(b64Path, "utf8").trim(), "base64");
-}
-
-async function fromUrl(url) {
-  const res = await fetch(url, { headers: { "User-Agent": UA, Accept: "image/*" } });
-  if (!res.ok) return null;
-  return Buffer.from(await res.arrayBuffer());
-}
-
 mkdirSync(outDir, { recursive: true });
 
 for (const [name, url] of Object.entries(FILES)) {
-  const dest = join(outDir, name);
-  if (existsSync(dest) && isJpeg(readFileSync(dest))) continue;
-
-  let buf = fromB64(name);
-  if (!buf && url) buf = await fromUrl(url);
-  if (!buf || !isJpeg(buf)) {
-    throw new Error(`Missing bundled photo ${name}`);
-  }
-  writeFileSync(dest, buf);
+  const res = await fetch(url, {
+    headers: { "User-Agent": UA, Accept: "image/*" },
+  });
+  if (!res.ok) throw new Error(`${name} HTTP ${res.status}`);
+  const buf = Buffer.from(await res.arrayBuffer());
+  if (!isJpeg(buf)) throw new Error(`${name} is not a JPEG`);
+  writeFileSync(join(outDir, name), buf);
+  console.log("saved", name, buf.length);
 }
-
-console.log(`photos ready in ${outDir}`);

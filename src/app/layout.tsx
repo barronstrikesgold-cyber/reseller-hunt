@@ -1,37 +1,35 @@
 import type { Metadata, Viewport } from "next";
-import { AppShell } from "@/components/app-shell";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Reseller",
+  title: "Finds",
   description:
-    "Aisle buy/pass. Shelf vs stored sold, cash left after fees and ship. Checks stay on this phone.",
-  applicationName: "Reseller",
+    "If it is not on this list, leave it. Phone aisle list for Hot Wheels Supers, one regular TH, Matchbox Super Chase, and the Sept 16 Pokémon ETB.",
+  applicationName: "Finds",
   appleWebApp: {
     capable: true,
+    title: "Finds",
     statusBarStyle: "default",
-    title: "Reseller",
   },
   icons: {
-    icon: "/icon.svg",
     apple: "/apple-touch-icon.png",
+    icon: "/icon.svg",
   },
   manifest: "/manifest.webmanifest",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F2F2F7",
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
   viewportFit: "cover",
+  themeColor: "#F2F2F7",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full">
-      <body className="min-h-full bg-[#F2F2F7] text-black">
-        <AppShell>{children}</AppShell>
-      </body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
   );
 }
