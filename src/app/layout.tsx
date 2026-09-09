@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Finds",
   description:
-    "If it is not on this list, leave it. Phone aisle list for Hot Wheels, Matchbox, Pokémon, and sports blisters.",
+    "If it is not on this list, leave it. Sports blister section includes the 2026 Topps Series 1 Baseball value / blaster and other hang-tab packs.",
   applicationName: "Finds",
   appleWebApp: {
     capable: true,

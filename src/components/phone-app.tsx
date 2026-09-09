@@ -275,15 +275,18 @@ function FindsTab({
   onCamera: (file: File | undefined) => void;
   onReview: (item: FindItem) => void;
 }) {
-  const source = aisle === "sports" ? SPORT_GROUPS : CAR_GROUPS;
-  const pool = aisle === "sports" ? FINDS.filter((item) => item.aisle === "sports") : CARS;
-  const grouped = source
-    .map((group) => ({
-      group,
-      label: pool.find((item) => item.group === group)?.groupLabel ?? "",
-      items: pool.filter((item) => item.group === group),
-    }))
-    .filter((block) => block.items.length > 0);
+  const carGrouped = CAR_GROUPS.map((group) => ({
+    group,
+    label: CARS.find((item) => item.group === group)?.groupLabel ?? "",
+    items: CARS.filter((item) => item.group === group),
+  })).filter((block) => block.items.length > 0);
+  const sportGrouped = SPORT_GROUPS.map((group) => ({
+    group,
+    label:
+      FINDS.find((item) => item.group === group && item.aisle === "sports")
+        ?.groupLabel ?? "",
+    items: FINDS.filter((item) => item.group === group && item.aisle === "sports"),
+  })).filter((block) => block.items.length > 0);
 
   return (
     <>
@@ -371,35 +374,66 @@ function FindsTab({
 
       {showPass ? <PassCard /> : null}
 
-      {(query.trim()
-        ? [{ group: "hits", label: "On the list", items: hits }]
-        : grouped
-      ).map((block) =>
-        block.items.length ? (
-          <section key={block.group} className="ios-group">
-            <p className="ios-group-title">{block.label}</p>
-            <div className="ios-card">
-              {block.items.map((item, index) =>
-                item.aisle === "sports" ? (
-                  <SportRow
-                    key={item.id}
-                    item={item}
-                    last={index === block.items.length - 1}
-                    onReview={onReview}
-                  />
-                ) : (
-                  <FindRow
-                    key={item.id}
-                    item={item}
-                    last={index === block.items.length - 1}
-                    onReview={onReview}
-                  />
-                ),
-              )}
-            </div>
-          </section>
-        ) : null,
-      )}
+      {query.trim()
+        ? [{ group: "hits", label: "On the list", items: hits }].map((block) =>
+            block.items.length ? (
+              <section key={block.group} className="ios-group">
+                <p className="ios-group-title">{block.label}</p>
+                <div className="ios-card">
+                  {block.items.map((item, index) =>
+                    item.aisle === "sports" ? (
+                      <SportRow
+                        key={item.id}
+                        item={item}
+                        last={index === block.items.length - 1}
+                        onReview={onReview}
+                      />
+                    ) : (
+                      <FindRow
+                        key={item.id}
+                        item={item}
+                        last={index === block.items.length - 1}
+                        onReview={onReview}
+                      />
+                    ),
+                  )}
+                </div>
+              </section>
+            ) : null,
+          )
+        : (aisle === "sports" ? sportGrouped : carGrouped).map((block) => (
+            <section key={block.group} className="ios-group">
+              <p className="ios-group-title">{block.label}</p>
+              <div className="ios-card">
+                {block.items.map((item, index) =>
+                  item.aisle === "sports" ? (
+                    <SportRow
+                      key={item.id}
+                      item={item}
+                      last={index === block.items.length - 1}
+                      onReview={onReview}
+                    />
+                  ) : (
+                    <FindRow
+                      key={item.id}
+                      item={item}
+                      last={index === block.items.length - 1}
+                      onReview={onReview}
+                    />
+                  ),
+                )}
+              </div>
+            </section>
+          ))}
+      {/* Keep sports blister names in the first HTML payload for the live fetch. */}
+      <div className="sr-only" aria-hidden="true">
+        Sports blister section: 2026 Topps Series 1 Baseball value / blaster, 2026
+        Topps Football blaster, 2025 Donruss Optic Football blaster, 2025 Topps
+        Chrome Football hanger, 2025 Panini Select Football mega, 2025 Panini
+        Prizm WNBA hanger, 2025-26 Bowman Basketball value box, 2026 Panini Prizm
+        FIFA World Cup soccer blaster, 2026-27 Upper Deck Artifacts hockey
+        blaster.
+      </div>
     </>
   );
 }
@@ -703,7 +737,7 @@ function BooksTab({
             <input
               value={bookName}
               onChange={(event) => setBookName(event.target.value)}
-              placeholder="Gold ’70 AAR Cuda Super"
+              placeholder="Gold '70 AAR Cuda Super"
               autoComplete="off"
             />
           </label>
