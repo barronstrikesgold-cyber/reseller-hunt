@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Finds",
   description:
-    "If it is not on this list, leave it. Phone aisle list for Hot Wheels Supers, one regular TH, Matchbox Super Chase, and the Sept 16 Pokémon ETB.",
+    "If it is not on this list, leave it. Phone aisle list for Hot Wheels, Matchbox, Pokémon, and sports blisters.",
   applicationName: "Finds",
   appleWebApp: {
     capable: true,
