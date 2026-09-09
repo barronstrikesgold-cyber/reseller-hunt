@@ -39,7 +39,7 @@ export default function BooksPage() {
 
       {entries.length === 0 ? (
         <p className="px-8 py-12 text-center text-[15px] text-[#8E8E93]">
-          No buys yet. Price it on Cash, then mark buy if leftover is real.
+          No buys yet. Scan a card and tap Buy, or price it on Cash.
         </p>
       ) : (
         entries.map((row) => (
