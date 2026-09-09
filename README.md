@@ -1,29 +1,32 @@
-# Reseller
+# Finds
 
-Phone buy/pass for aisle hunting. Finds list with product photos, cash left after ~13% fees and your ship estimate, ledger on this phone.
+Phone aisle list for iPhone Safari. If it is not on this list, leave it.
 
-## Open on iPhone (Safari)
+Tabs: **Finds**, **Cash**, **Books**. Finds opens a short category list: **Cars**, **Sports**, **Sneakers**, **Tech**, **Streetwear**. Each category is a full-width row. The first line on every list is **If it is not on this list, leave it.**
 
-**https://barronstrikesgold-cyber.github.io/**
+- Cars keeps the Hot Wheels Super / regular TH, Matchbox Super Chase, and Sept 16 Pokémon ETB buy list.
+- Sports is hang-tab / blaster / value / mega blister review only. No hobby boxes.
+- Sneakers is Goodwill / thrift: Jordan 1 / 3 / 4 / 11, Dunk SB, New Balance 990–993 / 2002R / 550, clean Samba, real Yeezy 350 or 700.
+- Tech is Apple / gaming plus Sony or Bose headphones and a camera that powers on.
+- Streetwear is tagged Supreme, Bape, Palace, Stussy, Chrome Hearts, and Off-White or Ambush collabs.
+- Scan or search a name that is not on the list and it says **Pass**.
+- Tap a row for a full-screen review. Photo uses the content width. Sticky Pass or Buy sits above the home indicator.
+- Last-sale lines use only stored sold numbers. Asking prices are never shown as sales. No invented Jordan, Dunk, or iPhone solds.
+- Cash subtracts about 13% fees and editable shipping. Cash left is unknown unless a stored sold exists. Buy only if leftover cash is real.
+- Books saves name, cost, and date in this phone’s local storage.
 
-Add to Home Screen if you want. Checks and the ledger stay on that phone.
-
-Source: https://github.com/barronstrikesgold-cyber/reseller-hunt
-
-`localhost` and HTML file attachments do not open in iPhone Safari. This is a public GitHub Pages site.
-
-## What it does
-
-- **Finds** — eight-item checklist with a bundled product photo on every row. Scan opens the camera; Buy writes the trip into Books. Survives reload.
-- **Cash** — enter shelf price or pick a find. Compare only to a stored sold number. Subtract ~13% fees and an editable ship estimate. Buy only if leftover cash is real. No sold number = unknown. Never invents a sold or a profit.
-- **Books** — cost, store, date, fees, sale, cash in. Profit is after those.
-
-Stored solds only: F40 August 2026 tracked average $122, Civic Custom tracker about $73, Lotus Sport Elise closer to $50. Cuda, Firebird, Skyline, Integra Super Chase, 30th Celebration ETB: no settled sale. Shop asks are not sales. ETB printed $49.99 Sept 16 — buy only at printed.
-
-## Local
+## Run locally
 
 ```bash
 npm install
-npm run build
-npm start
+node scripts/fetch-photos.mjs
+npm run dev -- --hostname 127.0.0.1 --port 43123
 ```
+
+Open http://127.0.0.1:43123
+
+## Live
+
+Public site: https://barronstrikesgold-cyber.github.io/
+
+Add to Home Screen from Safari for the large-title phone layout with the bottom tab bar.

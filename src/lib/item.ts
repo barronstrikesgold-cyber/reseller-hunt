@@ -2,7 +2,12 @@ export type Sale =
   | { kind: "settled"; amount: number; line: string }
   | { kind: "none" };
 
-export type AisleId = "cars" | "sports";
+export type AisleId =
+  | "cars"
+  | "sports"
+  | "sneakers"
+  | "tech"
+  | "streetwear";
 
 export type FindItem = {
   id: string;
@@ -18,7 +23,17 @@ export type FindItem = {
     | "baseball"
     | "basketball"
     | "hockey"
-    | "soccer";
+    | "soccer"
+    | "jordan"
+    | "dunk"
+    | "newbalance"
+    | "adidas"
+    | "yeezy"
+    | "apple"
+    | "electronics"
+    | "supreme"
+    | "street"
+    | "collab";
   groupLabel: string;
   badge: string;
   detail: string;

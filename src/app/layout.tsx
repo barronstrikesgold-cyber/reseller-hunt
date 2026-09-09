@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Finds",
   description:
-    "If it is not on this list, leave it. Sports blister section includes the 2026 Topps Series 1 Baseball value / blaster and other hang-tab packs.",
+    "If it is not on this list, leave it. Categories: Cars, Sports, Sneakers, Tech, Streetwear.",
   applicationName: "Finds",
   appleWebApp: {
     capable: true,
@@ -29,7 +29,13 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <p className="sr-only">
+          If it is not on this list, leave it. Cars, Sports, Sneakers, Tech,
+          Streetwear.
+        </p>
+        {children}
+      </body>
     </html>
   );
 }
