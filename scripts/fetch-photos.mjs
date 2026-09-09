@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
@@ -47,6 +47,63 @@ const FILES = {
     "https://pastimesports.ca/cdn/shop/files/11_7_bbf9db69-9179-4c98-b611-061fa7671715_1200x1200.jpg?v=1787261311",
   "artifacts.jpg":
     "https://cdn11.bigcommerce.com/s-cft20qcvqs/images/stencil/1280x1280/products/13078/512149/202627-upper-deck-artifacts-hockey-blaster-box__86148.1785571754.jpg?c=1",
+  "jordan-1.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Air_Jordan_1_Banned.jpg?width=800",
+  "jordan-3.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Air_Jordan_3_Retro.jpg?width=800",
+  "jordan-4.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Air_Jordan_4_(Cement).jpg?width=800",
+  "jordan-11.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Air_Jordan_XI_(cropped).jpg?width=800",
+  "dunk-sb.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/2023_Nike_SB_Dunk_Low_Pro_(2).jpg?width=800",
+  "nb-990.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/New_Balance_Women%27s_990_Running_Shoes.jpg?width=800",
+  "nb-2002r.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/New_Balance_2002R.jpg?width=800",
+  "nb-550.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/New_Balance_550.jpg?width=800",
+  "samba.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Adidas_Samba_OG.jpg?width=800",
+  "yeezy-350.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/2023_Adidas_Yeezy_Boost_350_V2_Sesame.jpg?width=800",
+  "iphone.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/IPhone_12_-_2.jpg?width=800",
+  "ipad.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/IPad_Air.png?width=800",
+  "macbook.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/MacBook_Pro_16_(M1_Pro,_2021)_-_Wikipedia.jpg?width=800",
+  "airpods.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/AirPods_Pro_(2nd_generation).jpg?width=800",
+  "watch.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Apple_Watch_Series_8.jpg?width=800",
+  "switch.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Nintendo-Switch-Console-Docked-wJoyConRB.jpg?width=800",
+  "bose.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Bose_QuietComfort_35_II_Wireless_Headphones.jpg?width=800",
+  "camera.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Sony_Alpha_7R_IV_body_with_Sony_Zeiss_55mm_lens.jpg?width=800",
+  "supreme.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Supreme_Logo.svg?width=800",
+  "bape.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Bape_Store_Harajuku_2015.jpg?width=800",
+  "palace.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Palace_Logo.jpg?width=800",
+  "stussy.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/St%C3%BCssy_KL_230509.jpg?width=800",
+  "chrome-hearts.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Chrome_Hearts_bracelet.jpg?width=800",
+  "offwhite.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/Off-White_x_Nike_Air_Force_1_%22MCA%22.png?width=800",
+  "ambush.jpg":
+    "https://commons.wikimedia.org/wiki/Special:FilePath/AMBUSH_x_Nike_Air_Max_180_High_Mens%27_sneakers.png?width=800",
+};
+
+const COPIES = {
+  "nb-991.jpg": "nb-990.jpg",
+  "nb-992.jpg": "nb-990.jpg",
+  "nb-993.jpg": "nb-990.jpg",
+  "yeezy-700.jpg": "yeezy-350.jpg",
 };
 
 const UA =
@@ -54,6 +111,10 @@ const UA =
 
 function isJpeg(buf) {
   return buf.length > 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function toJpeg(buf) {
@@ -80,17 +141,36 @@ function toJpeg(buf) {
   return result.stdout;
 }
 
+async function download(url) {
+  let last = "no response";
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    const res = await fetch(url, {
+      headers: { "User-Agent": UA, Accept: "image/*" },
+      redirect: "follow",
+    });
+    if (res.status === 429 || res.status >= 500) {
+      last = `HTTP ${res.status}`;
+      await sleep(1200 * (attempt + 1));
+      continue;
+    }
+    if (!res.ok) throw new Error(`${url} HTTP ${res.status}`);
+    return Buffer.from(await res.arrayBuffer());
+  }
+  throw new Error(`${url} ${last}`);
+}
+
 mkdirSync(outDir, { recursive: true });
 
 for (const [name, url] of Object.entries(FILES)) {
-  const res = await fetch(url, {
-    headers: { "User-Agent": UA, Accept: "image/*" },
-    redirect: "follow",
-  });
-  if (!res.ok) throw new Error(`${name} HTTP ${res.status}`);
-  const raw = Buffer.from(await res.arrayBuffer());
+  const raw = await download(url);
   const buf = toJpeg(raw);
   if (!isJpeg(buf)) throw new Error(`${name} is not a JPEG`);
   writeFileSync(join(outDir, name), buf);
   console.log("saved", name, buf.length);
+  await sleep(250);
+}
+
+for (const [dest, src] of Object.entries(COPIES)) {
+  copyFileSync(join(outDir, src), join(outDir, dest));
+  console.log("copied", dest, "from", src);
 }

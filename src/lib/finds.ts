@@ -1,12 +1,15 @@
+import { SNEAKERS } from "./sneakers";
 import { SPORTS } from "./sports";
-import type { FindItem } from "./item";
+import { STREETWEAR } from "./streetwear";
+import { TECH } from "./tech";
+import type { AisleId, FindItem } from "./item";
 
 export type { AisleId, FindItem, Sale } from "./item";
 
 const CAR_ROWS: Omit<FindItem, "aisle">[] = [
   {
     id: "cuda",
-    name: "'70 AAR Cuda",
+    name: "’70 AAR Cuda",
     group: "case",
     groupLabel: "Case P and Q",
     badge: "Super · case P",
@@ -23,14 +26,14 @@ const CAR_ROWS: Omit<FindItem, "aisle">[] = [
       "jjm28",
     ],
     photo: "/photos/cuda.jpg",
-    photoAlt: "Gold 2026 Super '70 Plymouth AAR Cuda",
+    photoAlt: "Gold 2026 Super ’70 Plymouth AAR Cuda",
     shelf: 1,
     shelfLabel: "About $1",
     sale: { kind: "none" },
   },
   {
     id: "firebird",
-    name: "'67 Firebird 400",
+    name: "’67 Firebird 400",
     group: "case",
     groupLabel: "Case P and Q",
     badge: "Super · case Q",
@@ -45,7 +48,7 @@ const CAR_ROWS: Omit<FindItem, "aisle">[] = [
       "jjm29",
     ],
     photo: "/photos/firebird.jpg",
-    photoAlt: "Blue 2026 Super '67 Pontiac Firebird 400",
+    photoAlt: "Blue 2026 Super ’67 Pontiac Firebird 400",
     shelf: 1,
     shelfLabel: "About $1",
     sale: { kind: "none" },
@@ -152,7 +155,7 @@ const CAR_ROWS: Omit<FindItem, "aisle">[] = [
   },
   {
     id: "impala",
-    name: "'64 Impala",
+    name: "’64 Impala",
     group: "supers",
     groupLabel: "Supers with a settled sale",
     badge: "Super",
@@ -160,7 +163,7 @@ const CAR_ROWS: Omit<FindItem, "aisle">[] = [
     superColor: "Teal Super",
     aliases: ["impala", "64 impala", "'64 impala", "chevy impala"],
     photo: "/photos/impala.jpg",
-    photoAlt: "Teal '64 Impala Super Treasure Hunt",
+    photoAlt: "Teal ’64 Impala Super Treasure Hunt",
     shelf: 1,
     shelfLabel: "About $1",
     sale: {
@@ -199,7 +202,7 @@ const CAR_ROWS: Omit<FindItem, "aisle">[] = [
     groupLabel: "Matchbox — card must say SUPER CHASE",
     badge: "SUPER CHASE only",
     detail:
-      "Yellow Integra, '85 Porsche 911 Rally, '78 Bronco, 2020 GT-R NISMO.",
+      "Yellow Integra, ’85 Porsche 911 Rally, ’78 Bronco, 2020 GT-R NISMO.",
     superColor: "Only if the card says SUPER CHASE",
     aliases: [
       "super chase",
@@ -218,7 +221,7 @@ const CAR_ROWS: Omit<FindItem, "aisle">[] = [
       "gtr nismo",
     ],
     photo: "/photos/matchbox.jpg",
-    photoAlt: "Matchbox Super Chase card for the '78 Bronco",
+    photoAlt: "Matchbox Super Chase card for the ’78 Bronco",
     shelf: 1,
     shelfLabel: "About $1",
     sale: { kind: "none" },
@@ -256,7 +259,13 @@ export const CARS: FindItem[] = CAR_ROWS.map((item) => ({
   aisle: "cars",
 }));
 
-export const FINDS: FindItem[] = [...CARS, ...SPORTS];
+export const FINDS: FindItem[] = [
+  ...CARS,
+  ...SPORTS,
+  ...SNEAKERS,
+  ...TECH,
+  ...STREETWEAR,
+];
 
 const PASS_BLOCK = [
   "fast foodie",
@@ -272,12 +281,26 @@ const PASS_BLOCK = [
   "pink porsche",
   "hobby box",
   "hobby boxes",
+  "sketchers",
+  "skechers",
+  "printer",
+  "dvd player",
+  "dvd",
+  "old router",
+  "router",
+  "mystery cable",
+  "unknown android",
+  "android phone",
+  "icloud",
+  "locked iphone",
+  "replica box",
+  "graphic tee",
 ];
 
 function normalize(value: string) {
   return value
     .toLowerCase()
-    .replace(/['']/g, "'")
+    .replace(/[’']/g, "'")
     .replace(/[^a-z0-9'.+\-\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -311,6 +334,19 @@ export function matchFinds(query: string): FindItem[] {
 
 export function saleLine(item: FindItem) {
   return item.sale.kind === "settled" ? item.sale.line : "No settled sale.";
+}
+
+export function reviewLane(item: FindItem) {
+  if (item.sport) return item.sport;
+  if (item.aisle === "cars") return "Hot Wheels / retail";
+  if (item.aisle === "sneakers") return "Sneakers · Goodwill / thrift";
+  if (item.aisle === "tech") return "Tech";
+  if (item.aisle === "streetwear") return "Streetwear";
+  return item.groupLabel;
+}
+
+export function itemsInAisle(aisle: AisleId) {
+  return FINDS.filter((item) => item.aisle === aisle);
 }
 
 export function packTypeLabel(item: FindItem) {
